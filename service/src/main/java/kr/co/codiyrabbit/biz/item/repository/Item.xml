@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.codiyrabbit.biz.item.repository.ItemRepository">
+
+	<!-- ########################### [ Field ] ######################### -->
+	<sql id="itemInsertField">
+		title
+		, name
+		, price
+		, link
+		, thumbName
+		, thumbPath
+		, category
+		, colorProperty
+		, detailProperty
+		, normalProperty
+	</sql>
+	<sql id="itemSelectField">
+		<include refid="itemInsertField"/>
+		, id
+		, createDatetime
+		, IFNULL((
+			SELECT COUNT(*)
+			  FROM TB_PRODUCT_POINT_ITEM
+			 WHERE itemId = T1.id
+		), 0) useCount
+		, (
+			SELECT isPublish
+			  FROM TB_PRODUCT_POINT_ITEM
+			 WHERE itemId = T1.id
+			   AND pointId = #{pointId}
+		) isPublish
+	</sql>
+	
+	<sql id="itemSearchCondition">
+		<where>
+			<if test='category != null and category != ""'>
+				category LIKE CONCAT('%', CONCAT(#{category}, '%'))
+			</if>
+			<if test='detailProperty != null and detailProperty != ""'>
+				AND detailProperty LIKE CONCAT('%', CONCAT(#{detailProperty}, '%'))
+			</if>
+			<if test='colorProperty != null and colorProperty != ""'>
+				AND colorProperty LIKE CONCAT('%', CONCAT(#{colorProperty}, '%'))
+			</if>
+			<if test='normalProperties != null'>
+				<foreach collection="normalProperties" open="AND (" separator="AND " close=")" item="prop">
+					normalProperty LIKE CONCAT('%', CONCAT(#{prop}, '%'))
+				</foreach>
+			</if>
+			<if test="pointId != null">
+				AND id IN (
+					SELECT itemId
+					  FROM TB_PRODUCT_POINT_ITEM
+					 WHERE pointId = #{pointId}
+				)
+			</if>
+			<if test="pointIds != null">
+				AND id IN (
+					SELECT itemId
+					  FROM TB_PRODUCT_POINT_ITEM
+					 WHERE pointId IN <foreach collection="pointIds" open="(" separator="," close=")" item="item">#{item}</foreach>
+				)
+			</if>
+		</where>
+	</sql>
+	<!-- ########################### [ DDL ] ######################### -->
+	<insert id="insert" parameterType="item">
+		INSERT INTO TB_ITEM
+		(
+			<include refid="itemInsertField"/>
+		) VALUES (
+			#{title}
+			, #{name}
+			, #{price}
+			, #{link}
+			, #{thumbName}
+			, #{thumbPath}
+			, #{category}
+			, #{colorProperty}
+			, #{detailProperty}
+			, #{normalProperty}
+		)
+		<selectKey resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="item">
+		UPDATE TB_ITEM
+		 <set>
+			 <if test='title != null and title != ""'>title = #{title},</if>
+			 <if test='name != null and name != ""'>name = #{name},</if>
+			 <if test='price != null'>price = #{price},</if>
+			 <if test='link != null and link != ""'>link = #{link},</if>
+			 <if test='thumbName != null and thumbName != ""'>thumbName = #{thumbName},</if>
+			 <if test='thumbPath != null and thumbPath != ""'>thumbPath = #{thumbPath},</if>
+			 <if test='category != null and category != ""'>category = #{category},</if>
+			 <if test='colorProperty != null and colorProperty != ""'>colorProperty = #{colorProperty},</if>
+			 <if test='detailProperty != null and detailProperty != ""'>detailProperty = #{detailProperty},</if>
+			 <if test='normalProperty != null and normalProperty != ""'>normalProperty = #{normalProperty},</if>
+		 </set>
+		 WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="item">
+		DELETE FROM TB_ITEM WHERE id = #{id}
+	</delete>
+
+	<delete id="deleteByIds" parameterType="itemSearch">
+		DELETE FROM TB_ITEM
+		<foreach collection="ids" open=" WHERE id IN ( " separator="," close=")" item="id">#{id}</foreach>
+	</delete>
+	
+	<delete id="deleteAll">
+	</delete>
+	
+	<select id="findOne" parameterType="item" resultType="item">
+		SELECT <include refid="itemSelectField"/>
+		  FROM TB_ITEM T1
+	  	 WHERE T1.id = #{id}
+	</select>
+	
+	<select id="findList" parameterType="itemSearch" resultType="item">
+		SELECT <include refid="itemSelectField"/>
+		  FROM TB_ITEM T1
+	  <include refid="itemSearchCondition"/>
+		 ORDER BY T1.id DESC
+		 LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="findListTotal" parameterType="itemSearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_ITEM T1
+	  <include refid="itemSearchCondition"/>
+	</select>
+	
+	<select id="findAll" parameterType="itemSearch" resultType="item">
+		SELECT <include refid="itemSelectField"/>
+		<choose>
+			<when test='isPublish != null and isPublish != ""'>
+				FROM TB_ITEM T1, TB_PRODUCT_POINT_ITEM T2
+				<include refid="itemSearchCondition"/>
+				AND T1.id = T2.itemId
+				AND T2.pointId = ${pointId}
+				AND T2.isPublish = #{isPublish}
+			</when>
+			<otherwise>
+				FROM TB_ITEM T1
+				<include refid="itemSearchCondition"/>
+			</otherwise>
+		</choose>
+		 ORDER BY T1.id DESC
+	</select>
+
+	<select id="findAllByPointId" parameterType="itemSearch" resultType="item">
+		SELECT <include refid="itemSelectField"/>
+		  FROM TB_ITEM T1, TB_PRODUCT_POINT_ITEM T2
+		 WHERE T1.id = T2.itemId
+		   AND T2.pointId = ${pointId}
+		<if test='isPublish != null and isPublish != ""'>AND T2.isPublish = #{isPublish}</if>
+	</select>
+	
+	<select id="findAllTotal" parameterType="itemSearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_ITEM T1
+	  <include refid="itemSearchCondition"/>
+	</select>
+	
+	<insert id="insertAll" parameterType="itemSearch">
+	</insert>
+
+	<insert id="insertAllCategory" parameterType="item">
+		INSERT INTO TB_ITEM_CATEGORY(itemId, categoryId)
+		VALUES
+		<foreach collection="categoryIds" item="categoryId" separator=" , ">
+			(#{id}, #{categoryId})
+		</foreach>
+	</insert>
+
+	<insert id="insertAllProperty" parameterType="item">
+		INSERT INTO TB_ITEM_PROPERTY(itemId, propertyId)
+		VALUES
+		<foreach collection="propertyIds" item="propertyId" separator=" , ">
+			(#{id}, #{propertyId})
+		</foreach>
+	</insert>
+
+</mapper>

@@ -1,0 +1,69 @@
+
+.input-group label { padding: 7px; }
+
+.table-data .text { padding: 7px; }
+
+.table .header { background-color: #f9f9f9 }
+
+.table tbody>tr>td.vert-align, .table.vert-align td{
+    vertical-align: middle;
+}
+
+.navigation-title {
+	font-size: 17px;
+			font-weight: bold;
+			color: #e55957;
+			margin-top: 20px;
+}
+
+.input-group-btn .fileinput-upload-button {
+	display: none;
+}
+
+.table.table-form td:first-child {
+	padding: 15px;
+	background-color: #f9f9f9;
+}
+
+.table.table-data thead tr:first-child {
+	background-color: #f9f9f9;
+}
+
+.table.text-center td {
+	text-align: center;
+}
+
+.input-group label { padding: 7px; }
+
+._loader {
+	display: none;
+	top: 0;
+	left: 0;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	z-index: 9999;
+	filter:Alpha(opacity=80);
+	opacity:0.8;
+}
+
+._loader .image {
+	top: 50%;
+	left: 50%;
+	width: 100px;
+	margin-left: -50px;
+	margin-top: -50px;
+	position: absolute;
+}
+
+.navigation-title {
+	font-size: 17px;
+			font-weight: bold;
+			color: #e55957;
+			margin-top: 20px;
+}
+
+.input-group-btn .fileinput-upload-button {
+	display: none;
+}

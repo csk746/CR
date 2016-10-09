@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<decorators defaultdir="/WEB-INF/decorators">
+	<excludes>
+		<!-- <pattern>/**/file/**</pattern> -->
+		<pattern>/login</pattern>
+		<pattern>/regist</pattern>
+		<pattern>/regist/complete</pattern>
+		<pattern>/codiynavi/images/*</pattern>
+	</excludes>
+
+	<decorator name="header"				page="header.jsp" />
+	<decorator name="top"					page="top.jsp" />
+	<decorator name="left"					page="left.jsp" />
+	<decorator name="footer"				page="footer.jsp" />
+	<decorator name="bottomScript"			page="bottomScript.jsp" />
+
+	<decorator name="mobileTop"				page="mobile_top.jsp" />
+
+	<decorator name="ga"					page="ga.jsp" />
+
+	<decorator name="layoutBase" 			page="layout_base.jsp">
+		<pattern>/**</pattern>
+	</decorator>
+	
+	<decorator name="layoutIframe" 			page="layout_iframe.jsp">
+		<pattern>/codiynavi/*</pattern>
+		<pattern>/codiynavi-source</pattern>
+	</decorator>
+
+</decorators>

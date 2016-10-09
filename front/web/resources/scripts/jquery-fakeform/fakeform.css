@@ -1,0 +1,62 @@
+/* fake form - placeholder */
+.placeholder { color: #bbb; }
+
+/* fake form - radio */
+.radio { width: 18px; height: 18px; vertical-align: -4px; margin-right: 3px; background: url('./radios.png') no-repeat; display: inline-block; }
+.radio.focus { background-position: 0 -33px; }
+.radio.checked { background-position: 0 -66px; }
+.radio.disabled { background-position: 0 -99px; }
+.radio.checked.disabled { background-position: 0 -132px; }
+
+/* fake form - checkbox */
+.checkbox { width: 18px; height: 18px; vertical-align: -4px; margin-right: 3px; background: url('./checks.png') no-repeat; display: inline-block; }
+.checkbox.focus { background-position: 0 -33px; }
+.checkbox.checked { background-position: 0 -66px; }
+.checkbox.disabled { background-position: 0 -99px; }
+.checkbox.checked.disabled { background-position: 0 -132px; }
+.checkbox.colored { background-image: url('./checks2.png'); }
+
+/* fake form - select */
+.select-title { color: #777; text-align: left; vertical-align: middle; padding: 4px 15px 4px 5px; border: 1px solid #999; background: #fff url('./selectarrow.png') no-repeat 100% 0; display: inline-block; -box-sizing: border-box; }
+.select-title strong { width: 100%; height: 1em; font-weight: normal; font-size: 13px; word-break: break-all; line-height: 1.2em; padding: 1px 0 2px; display: block; overflow: hidden; }
+.select-title.focus,
+.select-title.active { color: #000; border-color: #333; }
+.select-title.focus { background-position: 100% -22px; }
+.select-title.active { background-position: 100% -44px; }
+.select-title.disabled { color: #999; text-shadow: 1px 1px 0 #fff; border-color: #bbb; background-color: #eee; }
+
+.select-option { border: 1px solid #333; background: #fff; overflow: auto; }
+.select-option ul { margin: 0; padding: 0; }
+.select-option li { list-style: none; }
+.select-option span,
+.select-option strong { height: 1.1em; font-size: 13px; font-weight: normal; color: #888; white-space: nowrap; text-overflow: ellipsis; line-height: 1.4; text-decoration: none; padding: 4px 5px 7px; display: block; overflow: hidden; cursor: default; }
+.select-option strong { font-weight: bold; color: #000; border-top: 1px solid #eee; border-bottom: 1px solid #ccc; }
+.select-option li li span { padding-left: 10px; }
+.select-option span:hover,
+.select-option span.selected { color: #000; background: #eee; }
+.select-option .disabled span,
+.select-option .disabled strong { color: #bbb; text-decoration: line-through; background: none; }
+
+
+
+
+
+/* code highlight */
+button.codes { margin: -20px 20px 0; display: block; }
+div.codes { margin-top: -10px; padding: 10px 20px 0; display: none; }
+pre { position: relative; color: #f8f8f2; line-height: 1.5; padding: 0.75em 1.2em; border: 1px solid #464741; background: #272822; overflow: auto; -webkit-overflow-scrolling: touch; }
+pre:before { position: absolute; right: 0; top: 0; font-size: 10px; content: attr(data-type); color: #272822; text-transform: uppercase; padding: 0 0.3em; background: #fff; opacity: 0.9; }
+pre+pre { margin-top: 10px; }
+pre code .tag { color: #f92770; }
+pre code .attribute { color: #a6e22d; }
+pre code .attributevalue { color: #dadb74; }
+pre code .functionvar { color: #64d6ef; }
+pre code .functionname { color: #a6e22a; }
+pre code .functionargument { color: #fd9720; }
+pre code .conditions { color: #f92772; }
+pre code .boolean { color: #ab7ff7; }
+pre code .string,
+pre code .string * { color: #e6db72; }
+pre code .comment,
+pre code .comment * { color: #6c6d5e; }
+pre code .focus { font-style: italic; -text-decoration: underline; border-radius: 3px; background: #49483e; display: inline-block; outline: 1px solid #222218; }

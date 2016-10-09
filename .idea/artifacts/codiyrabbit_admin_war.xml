@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="codiyrabbit-admin:war">
+    <output-path>$PROJECT_DIR$/admin/target</output-path>
+    <root id="archive" name="kr.co.codiyrabbit.admin.war">
+      <element id="artifact" artifact-name="codiyrabbit-admin:war exploded" />
+    </root>
+  </artifact>
+</component>

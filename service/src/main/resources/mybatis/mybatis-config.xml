@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="false" />
+		<setting name="useGeneratedKeys" value="true" />
+		<setting name="defaultExecutorType" value="REUSE" />
+	</settings>
+
+	<typeAliases>
+
+		<typeAlias type="kr.codeblue.core.BaseSearch" alias="baseSearch"/>
+
+		<typeAlias type="kr.co.codiyrabbit.biz.member.domain.Member" alias="member"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.member.domain.MemberSearch" alias="memberSearch"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.category.domain.Category" alias="category"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.category.domain.CategorySearch" alias="categorySearch"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.property.domain.Property" alias="property"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.property.domain.PropertySearch" alias="propertySearch"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.item.domain.Item" alias="item"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.item.domain.ItemSearch" alias="itemSearch"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.product.domain.Product" alias="product"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.product.domain.ProductSearch" alias="productSearch"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.product.domain.ProductImage" alias="productImage"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.product.domain.ProductImageSearch" alias="productImageSearch"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.product.domain.ProductPoint" alias="productPoint"/>
+		<typeAlias type="kr.co.codiyrabbit.biz.product.domain.ProductPointSearch" alias="productPointSearch"/>
+
+	</typeAliases>
+
+	<mappers>
+
+		<mapper resource="kr/co/codiyrabbit/biz/member/repository/Member.xml" />
+		<mapper resource="kr/co/codiyrabbit/biz/category/repository/Category.xml" />
+		<mapper resource="kr/co/codiyrabbit/biz/property/repository/Property.xml" />
+		<mapper resource="kr/co/codiyrabbit/biz/item/repository/Item.xml" />
+		<mapper resource="kr/co/codiyrabbit/biz/product/repository/Product.xml" />
+		<mapper resource="kr/co/codiyrabbit/biz/product/repository/ProductImage.xml" />
+		<mapper resource="kr/co/codiyrabbit/biz/product/repository/ProductPoint.xml" />
+
+	</mappers>
+
+</configuration>

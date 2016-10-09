@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<util:properties id="serviceProp" location="classpath:/properties/service/service.properties"/>
+	
+	<bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	    <property name="url" value="jdbc:mysql://localhost:3306/codiyrabbit" />
+	    <property name="username" value="root" />
+	    <property name="password" value="7467" />
+	    <!-- validationQuery:유효 검사용 쿼리( 1개 이상의 row를 반환하는 쿼리를 넣어주면 된다. ) -->
+		<property name="validationQuery" value="select 1"/>
+		<!-- testWhileIdle:컨넥션이 놀고 있을때 validationQuery 를 이용해서 유효성 검사를 할지 여부. -->
+		<property name="testWhileIdle" value="true"/>
+		<!-- timeBetweenEvictionRunsMillis:해당 밀리초마다 validationQuery 를 이용하여 유효성 검사 진행 -->
+		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+	</bean>
+
+	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceSpied" />
+		<property name="logFormatter">
+	        <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+	            <property name="loggingType" value="MULTI_LINE" />
+	            <property name="sqlPrefix" value="SQL&#58;&#58;&#58;" />
+	        </bean>
+	    </property>
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/mybatis/mybatis-config.xml" />
+		<property name="transactionFactory">
+			<bean class="org.mybatis.spring.transaction.SpringManagedTransactionFactory"></bean>
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    	<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+        <property name="basePackage" value="kr.co.codiyrabbit.biz.*.repository" />
+    </bean>
+    
+    <!-- Redis Source -->
+	<!-- <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="esco.hk"/>
+		<property name="port" value="6379"/>
+		<property name="password" value="esco!@#)("/>
+	</bean>
+	    
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+	   	<property name="connectionFactory" ref="connectionFactory"/>
+	</bean> -->
+	<!-- Redis Source -->
+	    
+        
+</beans>

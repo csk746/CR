@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.codiyrabbit.biz.product.repository.ProductRepository">
+
+	<!-- ########################### [ Field ] ######################### -->
+	<sql id="productInsertField">
+		memberId
+		, code
+		, title
+		, description
+		, isDelete
+	</sql>
+	<sql id="productSelectField">
+		memberId
+		, code
+		, title
+		, description
+		, T1.isDelete
+		, T1.id
+		, T1.createDatetime
+		, viewCount
+		, T2.nickname memberNickName
+	</sql>
+	
+	<sql id="productSearchCondition">
+		<where>
+			T1.memberId = T2.id
+			<if test='id != null'>AND T1.id = #{id}</if>
+			<if test='code != null and code != ""'>AND code = #{code}</if>
+			<if test='memberId != null'>AND memberId = #{memberId}</if>
+			<if test='isDelete != null and isDelete != ""'>AND T1.isDelete = #{isDelete}</if>
+			<if test="ids != null">
+				<foreach collection="ids" open="AND T1.id IN (" separator="," close=")" item="id">#{id}</foreach>
+			</if>
+		</where>
+	</sql>
+	<!-- ########################### [ DDL ] ######################### -->
+	<insert id="insert" parameterType="product">
+		INSERT INTO TB_PRODUCT
+		(
+			<include refid="productInsertField"/>
+		) VALUES (
+			#{memberId}
+			, #{code}
+			, #{title}
+			, #{description}
+			, #{isDelete}
+		)
+		<selectKey resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="product">
+		UPDATE TB_PRODUCT
+		 <set>
+			 <if test='memberId != null and memberId != ""'>memberId = #{memberId},</if>
+			 <if test='code != null and code != ""'>code = #{code},</if>
+			 <if test='title != null and title != ""'>title = #{title},</if>
+			 <if test='description != null and description != ""'>description = #{description},</if>
+			 <if test='isDelete != null and isDelete != ""'>isDelete = #{isDelete},</if>
+		 </set>
+		 WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="product">
+		DELETE FROM TB_PRODUCT WHERE id = #{id}
+	</delete>
+	
+	<delete id="deleteAll">
+	</delete>
+	
+	<select id="findOne" parameterType="product" resultType="product">
+		SELECT <include refid="productSelectField"/>
+		  FROM TB_PRODUCT T1, TB_MEMBER T2
+		 WHERE T1.memberId = T2.id
+		   AND T1.id = #{id}
+	</select>
+
+	<select id="findOneByCode" parameterType="product" resultType="product">
+		SELECT <include refid="productSelectField"/>
+		FROM TB_PRODUCT T1
+		WHERE code = #{code}
+	</select>
+	
+	<select id="findList" parameterType="productSearch" resultType="product">
+		SELECT <include refid="productSelectField"/>
+		  FROM TB_PRODUCT T1, TB_MEMBER T2
+	  <include refid="productSearchCondition"/>
+		 ORDER BY T1.id DESC
+		 LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="findListTotal" parameterType="productSearch" resultType="long">
+		SELECT COUNT(T1.id)
+		  FROM TB_PRODUCT T1, TB_MEMBER T2
+	  <include refid="productSearchCondition"/>
+	</select>
+	
+	<select id="findAll" parameterType="productSearch" resultType="product">
+		SELECT <include refid="productSelectField"/>
+		  FROM TB_PRODUCT T1, TB_MEMBER T2
+	  <include refid="productSearchCondition"/>
+		 ORDER BY T1.id DESC
+	</select>
+
+	<resultMap id="productWithImageResult" type="product">
+		<id property="id" column="id" />
+		<collection select="kr.co.codiyrabbit.biz.product.repository.ProductImageRepository.findAll" javaType="java.util.ArrayList" property="images" ofType="productImage" column="{productId=id}"/>
+	</resultMap>
+
+	<select id="findAllWithImage" parameterType="productSearch" resultMap="productWithImageResult">
+		SELECT <include refid="productSelectField"/>
+		FROM TB_PRODUCT T1, TB_MEMBER T2
+		<include refid="productSearchCondition"/>
+		<choose>
+			<when test='orderBy != null and orderBy != ""'>${orderBy}</when>
+			<otherwise>ORDER BY T1.id DESC</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllTotal" parameterType="productSearch" resultType="long">
+		SELECT COUNT(T1.id)
+		  FROM TB_PRODUCT T1, TB_MEMBER T2
+	  <include refid="productSearchCondition"/>
+	</select>
+	
+	<insert id="insertAll" parameterType="productSearch">
+	</insert>
+
+	<delete id="deleteChild" parameterType="long">
+		DELETE FROM TB_PRODUCT_POINT_ITEM WHERE productId = #{id};
+		DELETE FROM TB_PRODUCT_POINT WHERE productId = #{id};
+		DELETE FROM TB_PRODUCT_IMAGE WHERE productId = #{id};
+	</delete>
+
+	<update id="updateViewCount" parameterType="long">
+		UPDATE TB_PRODUCT SET viewCount = viewCount + 1 WHERE id = #{id}
+	</update>
+
+</mapper>

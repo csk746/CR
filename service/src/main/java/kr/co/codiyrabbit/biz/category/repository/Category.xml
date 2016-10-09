@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.codiyrabbit.biz.category.repository.CategoryRepository">
+
+	<!-- ########################### [ Field ] ######################### -->
+	<sql id="categoryInsertField">
+		name
+		, depth
+		, parentId
+		, idx
+	</sql>
+	<sql id="categorySelectField">
+		<include refid="categoryInsertField"/>
+		, id
+		, createDatetime
+	</sql>
+	
+	<sql id="categorySearchCondition">
+		<where>
+			<if test="depth != null">
+				depth = #{depth}
+			</if>
+			<if test="parentId != null">
+				AND parentId = #{parentId}
+			</if>
+			<if test='name != null and name != ""'>
+				AND name = #{name}
+			</if>
+		</where>
+	</sql>
+	<!-- ########################### [ DDL ] ######################### -->
+	<insert id="insert" parameterType="category">
+		INSERT INTO TB_CATEGORY
+		(
+			<include refid="categoryInsertField"/>
+		) VALUES (
+			#{name}
+			, #{depth}
+			, #{parentId}
+			, #{idx}
+		)
+		<selectKey resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="category">
+		UPDATE TB_CATEGORY
+		 <set>
+			 <if test='name != null and name != ""'>name = #{name}</if>
+		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<update id="updateForIdx" parameterType="category">
+		UPDATE TB_CATEGORY
+	  	   SET idx = #{idx}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="category">
+		DELETE FROM TB_CATEGORY WHERE id = #{id}
+	</delete>
+	
+	<delete id="deleteAll">
+	</delete>
+	
+	<select id="findOne" parameterType="category" resultType="category">
+		SELECT <include refid="categorySelectField"/>
+		  FROM TB_CATEGORY T1
+		 WHERE id = #{id}
+	</select>
+	
+	<select id="findList" parameterType="categorySearch" resultType="category">
+		SELECT <include refid="categorySelectField"/>
+		  FROM TB_CATEGORY T1
+	  <include refid="categorySearchCondition"/>
+		 ORDER BY T1.id DESC
+		 LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="findListTotal" parameterType="categorySearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_CATEGORY T1
+	  <include refid="categorySearchCondition"/>
+	</select>
+	
+	<select id="findAll" parameterType="categorySearch" resultType="category">
+		SELECT <include refid="categorySelectField"/>
+		  FROM TB_CATEGORY T1
+	  <include refid="categorySearchCondition"/>
+		<choose>
+			<when test='orderBy != null and orderBy != ""'>
+				${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY T1.id DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllTotal" parameterType="categorySearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_CATEGORY T1
+	  <include refid="categorySearchCondition"/>
+	</select>
+	
+	<insert id="insertAll" parameterType="categorySearch">
+	</insert>
+
+	<update id="updateAllByIndex" parameterType="categorySearch">
+		<foreach collection="list" item="item"  index="index"  separator=";" >
+			UPDATE TB_CATEGORY set idx=#{item.idx} WHERE id=#{item.id}
+		</foreach>
+	</update>
+
+</mapper>

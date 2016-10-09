@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.codiyrabbit.biz.product.repository.ProductPointRepository">
+
+	<!-- ########################### [ Field ] ######################### -->
+	<sql id="productPointInsertField">
+		productId
+		, productImageId
+		, name
+		, `left`
+		, top
+		, type
+		, color
+	</sql>
+	<sql id="productPointSelectField">
+		<include refid="productPointInsertField"/>
+		, id
+		, createDatetime
+	</sql>
+	
+	<sql id="productPointSearchCondition">
+		<where>
+			<if test="productId != null">productId = #{productId}</if>
+		</where>
+	</sql>
+	<!-- ########################### [ DDL ] ######################### -->
+	<insert id="insert" parameterType="productPoint">
+		INSERT INTO TB_PRODUCT_POINT
+		(
+			<include refid="productPointInsertField"/>
+		) VALUES (
+			#{productId}
+			, #{productImageId}
+			, #{name}
+			, #{left}
+			, #{top}
+			, #{type}
+			, #{color}
+		)
+		<selectKey resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="productPoint">
+		UPDATE TB_PRODUCT_POINT
+		 <set>
+			 <if test='productId != null and productId != ""'>productId = #{productId},</if>
+			 <if test='productImageId != null and productImageId != ""'>productImageId = #{productImageId},</if>
+			 <if test='name != null and name != ""'>name = #{name},</if>
+			 <if test='left != null and left != ""'>left = #{left},</if>
+			 <if test='top != null and top != ""'>top = #{top},</if>
+			 <if test='type != null and type != ""'>type = #{type},</if>
+			 <if test='color != null and color != ""'>color = #{color},</if>
+		 </set>
+		 WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="productPoint">
+		DELETE FROM TB_PRODUCT_POINT WHERE id = #{id}
+	</delete>
+	
+	<delete id="deleteAll">
+	</delete>
+	
+	<select id="findOne" parameterType="productPoint" resultType="productPoint">
+		SELECT <include refid="productPointSelectField"/>
+		  FROM TB_PRODUCT_POINT T1
+	</select>
+	
+	<select id="findList" parameterType="productPointSearch" resultType="productPoint">
+		SELECT <include refid="productPointSelectField"/>
+		  FROM TB_PRODUCT_POINT T1
+	  <include refid="productPointSearchCondition"/>
+		 ORDER BY T1.id DESC
+		 LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="findListTotal" parameterType="productPointSearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_PRODUCT_POINT T1
+	  <include refid="productPointSearchCondition"/>
+	</select>
+	
+	<select id="findAll" parameterType="productPointSearch" resultType="productPoint">
+		SELECT <include refid="productPointSelectField"/>
+		  FROM TB_PRODUCT_POINT T1
+	  <include refid="productPointSearchCondition"/>
+		<choose>
+			<when test='orderBy != null and orderBy != ""'>${orderBy}</when>
+			<otherwise>ORDER BY T1.id DESC</otherwise>
+		</choose>
+	</select>
+
+	<resultMap id="pointWithItemResult" type="productPoint">
+		<id property="id" column="id" />
+		<result column="isPublish" property="isPublish"/>
+		<collection select="kr.co.codiyrabbit.biz.item.repository.ItemRepository.findAll" javaType="java.util.ArrayList" property="items" ofType="item" column="{pointId=id,isPublish=isPublish}"/>
+	</resultMap>
+
+	<!--<select id="findAllWithItem" parameterType="productPointSearch" resultMap="pointWithItemResult">-->
+		<!--SELECT <include refid="productPointSelectField"/>-->
+			   <!--, '${isPublish}' as 'isPublish'-->
+		<!--<choose>-->
+			<!--<when test='isPublish != null and isPublish != ""'>-->
+				<!--FROM TB_PRODUCT_POINT T1, TB_PRODUCT_POINT_ITEM T2-->
+				<!--<include refid="productPointSearchCondition"/>-->
+				<!--AND T1.id = T2.pointId-->
+				<!--AND T2.isPublish = #{isPublish}-->
+			<!--</when>-->
+			<!--<otherwise>-->
+				<!--FROM TB_PRODUCT_POINT T1-->
+				<!--<include refid="productPointSearchCondition"/>-->
+			<!--</otherwise>-->
+		<!--</choose>-->
+		<!--ORDER BY T1.name ASC-->
+	<!--</select>-->
+
+	<select id="findAllTotal" parameterType="productPointSearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_PRODUCT_POINT T1
+	  <include refid="productPointSearchCondition"/>
+	</select>
+	
+	<insert id="insertAll" parameterType="productPointSearch">
+	</insert>
+
+	<insert id="insertAllItem" parameterType="productPoint">
+		INSERT INTO TB_PRODUCT_POINT_ITEM(pointId, itemId, isPublish, productId)
+		VALUES 
+		<foreach collection="items" separator="," item="item">
+			(#{id}, #{item.id}, #{item.isPublish}, #{productId})
+		</foreach>
+	</insert>
+
+</mapper>

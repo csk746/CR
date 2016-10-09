@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.codiyrabbit.biz.member.repository.MemberRepository">
+
+	<!-- ########################### [ Field ] ######################### -->
+	<sql id="memberInsertField">
+		  loginId
+		, password
+		, role
+		, nickname
+		, sex
+		, email
+		, phone
+		, snsType
+		, snsId
+		, age
+		, area
+	</sql>
+	<sql id="memberSelectField">
+		<include refid="memberInsertField"/>
+		, id
+		, createDatetime
+		, isAdmin
+	</sql>
+	
+	<sql id="memberSearchCondition">
+		<where>
+			<if test='isAdmin != null and isAdmin != ""'>
+				isAdmin = #{isAdmin}
+			</if>
+		</where>
+	</sql>
+	<!-- ########################### [ DDL ] ######################### -->
+	<insert id="insert" parameterType="member">
+		INSERT INTO TB_MEMBER
+		(
+			<include refid="memberInsertField"/>
+		) VALUES (
+			#{loginId}
+			, #{password}
+			, #{role}
+			, #{nickname}
+			, #{sex}
+			, #{email}
+			, #{phone}
+			, #{snsType}
+			, #{snsId}
+			, #{age}
+			, #{area}
+		)
+		<selectKey resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="member">
+		UPDATE TB_MEMBER
+		 <set>
+			 <if test='loginId != null and loginId != ""'>loginId</if>
+			 <if test='password != null and password != ""'>password</if>
+			 <if test='role != null and role != ""'>role</if>
+			 <if test='nickname != null and nickname != ""'>nickname</if>
+			 <if test='sex != null and sex != ""'>sex</if>
+			 <if test='email != null and email != ""'>email</if>
+			 <if test='phone != null and phone != ""'>phone</if>
+			 <if test='snsType != null and snsType != ""'>snsType</if>
+			 <if test='snsId != null and snsId != ""'>snsId</if>
+			 <if test='age != null and age != ""'>age</if>
+			 <if test='area != null and area != ""'>area</if>
+		 </set>
+		 WHERE id = #{id}
+	</update>
+	
+	<!--<delete id="delete" parameterType="member">-->
+		<!--DELETE FROM TB_MEMBER WHERE id = #{id}-->
+	<!--</delete>-->
+	<update id="delete" parameterType="member">
+		UPDATE TB_MEMBER SET isDelete = 'Y' WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteAll">
+	</delete>
+	
+	<select id="findOne" parameterType="member" resultType="member">
+		SELECT <include refid="memberSelectField"/>
+		  FROM TB_MEMBER T1
+	</select>
+
+	<select id="findOneByLoginId" parameterType="string" resultType="member">
+		SELECT <include refid="memberSelectField"/>
+		FROM TB_MEMBER T1
+		WHERE loginId = #{loginId}
+	</select>
+	
+	<select id="findList" parameterType="memberSearch" resultType="member">
+		SELECT <include refid="memberSelectField"/>
+		  FROM TB_MEMBER T1
+	  <include refid="memberSearchCondition"/>
+		 ORDER BY T1.id DESC
+		 LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="findListTotal" parameterType="memberSearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_MEMBER T1
+	  <include refid="memberSearchCondition"/>
+	</select>
+	
+	<select id="findAll" parameterType="memberSearch" resultType="member">
+		SELECT <include refid="memberSelectField"/>
+		  FROM TB_MEMBER T1
+	  <include refid="memberSearchCondition"/>
+		<choose>
+			<when test='orderBy != null and orderBy != ""'>
+				${orderBy}
+			</when>
+			<otherwise>
+				ORDER BY T1.id DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllTotal" parameterType="memberSearch" resultType="long">
+		SELECT COUNT(id)
+		  FROM TB_MEMBER T1
+	  <include refid="memberSearchCondition"/>
+	</select>
+	
+	<insert id="insertAll" parameterType="memberSearch">
+	</insert>
+
+</mapper>

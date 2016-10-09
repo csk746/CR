@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<util:properties id="serviceProp" location="classpath*:properties/service/service.properties"/>
+
+<!-- google -->
+	<beans:bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<beans:property name="host" value="smtp.gmail.com"/>
+        <beans:property name="port" value="465"/>
+        <beans:property name="username" value="#{serviceProp['mail.gmail.email']}"/>
+        <beans:property name="password" value="#{serviceProp['mail.gmail.password']}"/>
+        <beans:property name="protocol" value="smtps" />
+        <beans:property name="defaultEncoding" value="UTF-8"/>
+
+		<beans:property name="javaMailProperties">
+		   <beans:props>
+	       	      <beans:prop key="mail.smtp.auth">true</beans:prop>
+	       	      <beans:prop key="mail.smtp.starttls.enable">true</beans:prop>
+	       	   </beans:props>
+		</beans:property>
+	</beans:bean>
+
+<!-- amazon -->
+<!--
+	<beans:bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<beans:property name="host" value="email-smtp.us-east-1.amazonaws.com"/>
+        <beans:property name="port" value="465"/>
+        <beans:property name="username" value="AKIAJVMW5C77ARYYIQ6A"/>
+        <beans:property name="password" value="Av2igxh1dlLRmk+lTQirkdgn+VgK4Nb55kDkh5bnkdAw"/>
+        <beans:property name="protocol" value="smtps" />
+        <beans:property name="defaultEncoding" value="UTF-8"/>
+
+
+		<beans:property name="javaMailProperties">
+		   <beans:props>
+	       	      <beans:prop key="mail.smtp.auth">true</beans:prop>
+	       	      <beans:prop key="mail.smtp.ssl.enable">true</beans:prop>
+		          <beans:prop key="mail.transport.protocol">smtps</beans:prop>
+	       	   </beans:props>
+		</beans:property>
+	</beans:bean>
+ -->
+
+<!-- naver -->
+<!--
+	<beans:bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<beans:property name="host" value="smtp.naver.com"/>
+        <beans:property name="port" value="465"/>
+        <beans:property name="username" value="#{mailProp['mail.naver.email']}"/>
+        <beans:property name="password" value="#{mailProp['mail.naver.password']}"/>
+        <beans:property name="protocol" value="smtps" />
+        <beans:property name="defaultEncoding" value="UTF-8"/>
+
+		<beans:property name="javaMailProperties">
+		   <beans:props>
+	       	      <beans:prop key="mail.smtp.auth">true</beans:prop>
+	       	      <beans:prop key="mail.smtp.starttls.enable">true</beans:prop>
+	       	      <beans:prop key="mail.smtps.ssl.checkserveridentity">true</beans:prop>
+	       	      <beans:prop key="mail.smtps.ssl.trust">*</beans:prop>
+	       	   </beans:props>
+		</beans:property>
+	</beans:bean>
+	
+	<beans:bean id="mailService" class="io.codeb.lollife.common.mail.MailServiceImpl">
+		<beans:property name="javaMailSender" ref="javaMailSender"/>
+	</beans:bean>
+-->
+	
+</beans:beans>

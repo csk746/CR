@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<title> fake form with jquery </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+
+<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="./jquery-fakeform-0.5.js"></script>
+
+<script>
+// initialize
+$(function() {
+	$('select, input, textarea').fakeform();
+	/* 위 함수는 아래와 동일
+		$('select').fakeselect();
+		$('input[type="radio"], input[type="checkbox"]').fakecheck();
+		$('textarea, input').not('[type="radio"], [type="checkbox"]').fakeplaceholder();
+	*/
+});
+</script>
+
+<style>
+html, body, fieldset, legend, p { margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: #fff; }
+body:after { height: 50px; content: ''; display: block; }
+body, input, textarea { font-family: 돋움, dotum; font-size: 12px; color: #555; line-height: 1.55em; }
+h1 { font-family: 'verdana'; font-size: 22px; font-weight: normal; color: #000; margin: 30px 20px 0; padding: 0 0 20px; }
+h1 span { font-size: 14px; color: #999; }
+h2 { font-family: 'verdana'; font-size: 15px; font-weight: normal; color: #000; margin: 70px 20px -10px; padding: 0 0 7px; border-bottom: 2px solid #aaa; }
+fieldset { clear: both; margin: 30px 20px; border: 1px solid #aaa; box-shadow: 0 2px 0 #eee; overflow: hidden; }
+fieldset legend { color: #999; margin: 0 5px; padding: 5px; }
+fieldset legend strong { color: #0068b7; letter-spacing: -0.05em; }
+fieldset legend em { font-style: normal; color: #ec6941; }
+fieldset .padding { padding: 5px 15px 13px; }
+fieldset .padding pre { margin: 10px 0 10px; }
+fieldset .padding pre:before { display: none; }
+fieldset.supports { padding: 0; }
+fieldset.supports .padding { padding: 0 10px 10px; }
+fieldset.supports .padding pre { margin: 0; }
+fieldset .buttons { margin-top: 5px; }
+label { margin-right: 6px; }
+select { font-size: 11px; color: #666; }
+.textinputs input,
+.textinputs textarea { width: 150px; height: 1.6em; padding-left: 5px; border: 1px solid; border-color: #999 #bbb #bbb #999; }
+.textinputs textarea { width: 400px; height: 5.6em; padding-top: 3px; overflow: auto; }
+
+
+
+
+
+/* fake form - placeholder */
+.placeholder { color: #bbb; }
+
+/* fake form - radio */
+.radio { width: 18px; height: 18px; vertical-align: -4px; margin-right: 3px; background: url('./radios.png') no-repeat; display: inline-block; }
+.radio.focus { background-position: 0 -33px; }
+.radio.checked { background-position: 0 -66px; }
+.radio.disabled { background-position: 0 -99px; }
+.radio.checked.disabled { background-position: 0 -132px; }
+
+/* fake form - checkbox */
+.checkbox { width: 18px; height: 18px; vertical-align: -4px; margin-right: 3px; background: url('./checks.png') no-repeat; display: inline-block; }
+.checkbox.focus { background-position: 0 -33px; }
+.checkbox.checked { background-position: 0 -66px; }
+.checkbox.disabled { background-position: 0 -99px; }
+.checkbox.checked.disabled { background-position: 0 -132px; }
+.checkbox.colored { background-image: url('./checks2.png'); }
+
+/* fake form - select */
+.select-title { color: #777; text-align: left; vertical-align: middle; padding: 4px 15px 4px 5px; border: 1px solid #999; background: #fff url('./selectarrow.png') no-repeat 100% 0; display: inline-block; -box-sizing: border-box; }
+.select-title strong { width: 100%; height: 1em; font-weight: normal; font-size: 11px; word-break: break-all; line-height: 1.2em; padding: 1px 0 2px; display: block; overflow: hidden; }
+.select-title.focus,
+.select-title.active { color: #000; border-color: #333; }
+.select-title.focus { background-position: 100% -22px; }
+.select-title.active { background-position: 100% -44px; }
+.select-title.disabled { color: #999; text-shadow: 1px 1px 0 #fff; border-color: #bbb; background-color: #eee; }
+
+.select-option { border: 1px solid #333; background: #fff; overflow: auto; }
+.select-option ul { margin: 0; padding: 0; }
+.select-option li { list-style: none; }
+.select-option span,
+.select-option strong { height: 1.1em; font-size: 11px; font-weight: normal; color: #888; white-space: nowrap; text-overflow: ellipsis; line-height: 1.4; text-decoration: none; padding: 4px 5px 7px; display: block; overflow: hidden; cursor: default; }
+.select-option strong { font-weight: bold; color: #000; border-top: 1px solid #eee; border-bottom: 1px solid #ccc; }
+.select-option li li span { padding-left: 10px; }
+.select-option span:hover,
+.select-option span.selected { color: #000; background: #eee; }
+.select-option .disabled span,
+.select-option .disabled strong { color: #bbb; text-decoration: line-through; background: none; }
+
+
+
+
+
+/* code highlight */
+button.codes { margin: -20px 20px 0; display: block; }
+div.codes { margin-top: -10px; padding: 10px 20px 0; display: none; }
+pre { position: relative; color: #f8f8f2; line-height: 1.5; padding: 0.75em 1.2em; border: 1px solid #464741; background: #272822; overflow: auto; -webkit-overflow-scrolling: touch; }
+pre:before { position: absolute; right: 0; top: 0; font-size: 10px; content: attr(data-type); color: #272822; text-transform: uppercase; padding: 0 0.3em; background: #fff; opacity: 0.9; }
+pre+pre { margin-top: 10px; }
+pre code .tag { color: #f92770; }
+pre code .attribute { color: #a6e22d; }
+pre code .attributevalue { color: #dadb74; }
+pre code .functionvar { color: #64d6ef; }
+pre code .functionname { color: #a6e22a; }
+pre code .functionargument { color: #fd9720; }
+pre code .conditions { color: #f92772; }
+pre code .boolean { color: #ab7ff7; }
+pre code .string,
+pre code .string * { color: #e6db72; }
+pre code .comment,
+pre code .comment * { color: #6c6d5e; }
+pre code .focus { font-style: italic; -text-decoration: underline; border-radius: 3px; background: #49483e; display: inline-block; outline: 1px solid #222218; }
+
+</style>
+</head>
+
+<body>
+
+<h1>FAKE FORM <span>v0.5</span></h1>
+
+<!-- 실행 -->
+<fieldset>
+	<legend><strong>실행</strong></legend>
+	<div class="padding">
+
+	기본 적용 함수.
+	<pre data-type="js"><code>$('select, input, textarea')[[.fakeform()]];</code></pre>
+
+	<br>
+
+	위 함수는 아래 함수들을 한 번에 모두 실행하는 함수.<br>
+	별도로 아래와 같이 필요한 기능만 각각 실행할 수도 있고,<br>
+	지원함수들도 fakeform 함수 하나를 통해서 실행할 수 있음.
+	<pre data-type="js"><code>$('select')[[.fakeselect()]];
+$('input[type="radio"], input[type="checkbox"]')[[.fakecheck()]];
+$('textarea, input').not('[type="radio"], [type="checkbox"]')[[.fakeplaceholder()]];</code></pre>
+
+	</div>
+</fieldset>
+<!-- 실행 //-->
+
+
+
+<h2>.fakeplaceholder()</h2>
+
+<!-- 기본 -->
+<fieldset>
+	<legend><strong>기본</strong></legend>
+	<div class="padding textinputs">
+
+	<input type="text" placeholder="안내 문구">
+	<input type="text" placeholder="안내 문구" value="값이 미리 지정되어 있을 때">
+	<br>
+	<br>
+	<textarea placeholder="안내 문구"></textarea>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="text" placeholder="안내 문구">
+&lt;input type="text" placeholder="안내 문구" value="값이 미리 지정되어 있을 때">
+
+&lt;textarea placeholder="안내 문구">&lt;/textarea></code></pre>
+</div>
+<!-- 기본 //-->
+
+
+<!-- readonly 상태일 때 -->
+<fieldset>
+	<legend><strong>readonly 상태일 때</strong>(변경 후 <em>$().fakeplaceholder()</em> 함수 실행)</legend>
+	<div class="padding textinputs">
+
+	<input type="text" id="inputtextreadonly" placeholder="readonly" readonly="readonly">
+
+	<p class="buttons">
+		<button onclick="$('#inputtextreadonly').val('값이 변경 됨').fakeplaceholder()">readonly 일때 value 변경</button>
+		<button onclick="$('#inputtextreadonly').val('').fakeplaceholder()">readonly 일때 value 제거</button>
+	</p>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="text" id="inputtextreadonly" placeholder="readonly" readonly="readonly">
+
+&lt;button onclick="$('#inputtextreadonly').val('값이 변경 됨')[[.fakeplaceholder()]]">readonly 일때 value 변경&lt;/button>
+&lt;button onclick="$('#inputtextreadonly').val('')[[.fakeplaceholder()]]">readonly 일때 value 제거&lt;/button></code></pre>
+</div>
+<!-- readonly 상태일 때 //-->
+
+
+
+<h2>.fakecheck()</h2>
+
+<!-- 지원함수 -->
+<fieldset class="supports">
+	<legend><strong>지원함수</strong></legend>
+	<div class="padding">
+
+	<pre data-type="js"><code>$()[[.fakecheck('enable')]]; // disabled 상태 제거
+$()[[.fakecheck('disable')]]; // disabled 상태로 변경
+$()[[.fakecheck('remove')]]; // fakecheck 스크립트 제거
+$()[[.fakecheck()]]; // 외부에서 값을 변경하는 등의 처리를 했을 경우 상태 리셋.</code></pre>
+
+	</div>
+</fieldset>
+<!-- 지원함수 //-->
+
+<!-- 기본 -->
+<fieldset>
+	<legend><strong>기본</strong>(라디오 버튼은 form과 name이 제대로 지정되어 있어야 동작. 첫번째 요소 변경 시 현재 상태 alert)</legend>
+	<div class="padding">
+
+	<form name="asdf">
+
+	<input type="radio" id="radio1-1" name="radio1" checked="checked">
+	<label for="radio1-1">라디오 버튼 1-1</label>
+	<input type="radio" id="radio1-2" name="radio1">
+	<label for="radio1-2">라디오 버튼 1-2</label>
+	<input type="radio" id="radio1-3" name="radio1" disabled="disabled">
+	<label for="radio1-3">라디오 버튼 1-3(disabled)</label>
+
+	<br>
+	<br>
+
+	<input type="checkbox" id="check1" name="check1" checked="checked">
+	<label for="check1">체크박스 1</label>
+	<input type="checkbox" id="check2" name="check2">
+	<label for="check2">체크박스 2</label>
+	<input type="checkbox" id="check3" name="check3" disabled="disabled">
+	<label for="check3">체크박스 3(disabled)</label>
+
+	</form>
+
+	</div>
+</fieldset>
+<script>
+$(function() {
+	$('input[name="radio1"]').click(function() {
+		alert('라디오 버튼 1-1'+' '+($('input[name="radio1"]').get(0).checked ? '선택' : '선택해제'));
+	});
+	$('input#check1').click(function() {
+		alert('체크박스 1'+' '+(this.checked ? '체크' : '체크해제'));
+	});
+})
+</script>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="radio" id="radio1-1" name="radio1" checked="checked">
+&lt;label for="radio1-1">라디오 버튼 1-1&lt;/label>
+&lt;input type="checkbox" id="check1" name="check1" checked="checked">
+&lt;label for="check1">체크박스 1&lt;/label></code></pre>
+<pre data-type="js"><code>$('input[name="radio1"]').click(function() {
+	alert('라디오 버튼 1-1'+' '+($('input[name="radio1"]').get(0).checked ? '선택' : '선택해제'));
+});
+$('input#check1').click(function() {
+	alert('체크박스 1'+' '+(this.checked ? '체크' : '체크해제'));
+});</code></pre>
+</div>
+<!-- 기본 //-->
+
+
+<!-- 디자인 변경 -->
+<fieldset>
+	<legend><strong>디자인 변경</strong>(해당 input 엘리먼트에 CSS 클래스를 지정하면 대체 요소에도 추가됨)</legend>
+	<div class="padding">
+
+	<form name="asdf">
+
+	<input type="checkbox" id="check-design1" name="check-design1" class="colored" checked="checked">
+	<label for="check-design1">체크박스 디자인 변경</label>
+
+	<input type="checkbox" id="check-design2" name="check-design2" class="colored" checked="checked" disabled="disabled">
+	<label for="check-design2">체크박스 디자인 변경(disabled)</label>
+
+	</form>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="checkbox" id="check-design1" name="check-design1" [[class="colored"]] checked="checked">
+&lt;label for="check-design1">체크박스 디자인 변경&lt;/label>
+
+&lt;input type="checkbox" id="check-design2" name="check-design2" [[class="colored"]] checked="checked" disabled="disabled">
+&lt;label for="check-design2">체크박스 디자인 변경(disabled)&lt;/label></code></pre>
+</div>
+<!-- 디자인 변경 //-->
+
+
+<!-- fakecheck 적용/제거 -->
+<fieldset>
+	<legend><strong>fakecheck 적용/제거</strong>(적용 시 <em>$().fakecheck()</em> 제거 시 <em>$().fakecheck('remove')</em> 함수 실행)</legend>
+	<div class="padding">
+
+	<form>
+
+	<input type="radio" id="radio-toggle-1" name="radio-toggle">
+	<label for="radio-toggle-1">라디오 버튼 1</label>
+	<input type="radio" id="radio-toggle-2" name="radio-toggle">
+	<label for="radio-toggle-2">라디오 버튼 2</label>
+	<input type="radio" id="radio-toggle-3" name="radio-toggle">
+	<label for="radio-toggle-3">라디오 버튼 3</label>
+
+	<input type="checkbox" id="check-toggle" name="check-toggle">
+	<label for="check-toggle">체크박스 레이블</label>
+
+	</form>
+
+	<p class="buttons">
+		<button onclick="togglefakecheck.add();">fakecheck 적용</button>
+		<button onclick="togglefakecheck.remove();">fakecheck 제거</button>
+	</p>
+
+	<script>
+	var togglefakecheck = (function() {
+		var $toggletarget = $('#radio-toggle-1, #radio-toggle-2, #radio-toggle-3, #check-toggle');
+		return {
+			add: function() {
+				$toggletarget.fakecheck();
+			},
+			remove: function() {
+				$toggletarget.fakecheck('remove');
+			}
+		}
+	})();
+	</script>
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="radio" id="radio-toggle-1" name="radio-toggle">
+&lt;label for="radio-toggle-1">라디오 버튼 1&lt;/label>
+&lt;input type="radio" id="radio-toggle-2" name="radio-toggle">
+&lt;label for="radio-toggle-2">라디오 버튼 2&lt;/label>
+&lt;input type="radio" id="radio-toggle-3" name="radio-toggle">
+&lt;label for="radio-toggle-3">라디오 버튼 3&lt;/label>
+
+&lt;input type="checkbox" id="check-toggle" name="check-toggle">
+&lt;label for="check-toggle">체크박스 레이블&lt;/label>
+
+&lt;button onclick="togglefakecheck.add();">fakecheck 적용&lt;/button>
+&lt;button onclick="togglefakecheck.remove();">fakecheck 제거&lt;/button></code></pre>
+<pre data-type="js"><code>var togglefakecheck = (function() {
+	var $toggletarget = $('#radio-toggle-1, #radio-toggle-2, #radio-toggle-3, #check-toggle');
+	return {
+		add: function() {
+			$toggletarget[[.fakecheck()]];
+		},
+		remove: function() {
+			$toggletarget[[.fakecheck('remove')]];
+		}
+	}
+})();</code></pre>
+</div>
+<!-- fakecheck 적용/제거 //-->
+
+
+<!-- disabled 속성 변경 -->
+<fieldset>
+	<legend><strong>disabled 속성 변경</strong>(속성을 제거할 때 <em>$().fakecheck('enable')</em>, 지정할 때 <em>$().fakecheck('disable')</em> 함수 사용. 또는 직접 지정 후 <em>$().fakecheck()</em> 함수 실행)</legend>
+	<div class="padding">
+
+	<form>
+
+	<input type="radio" id="radio-toggledisable-1" name="radio-toggledisable">
+	<label for="radio-toggledisable-1">라디오 버튼 레이블</label>
+
+	<input type="radio" id="radio-toggledisable-2" name="radio-toggledisable">
+	<label for="radio-toggledisable-2">라디오 버튼 레이블</label>
+
+	<input type="checkbox" id="check-toggledisable" name="check-toggledisable">
+	<label for="check-toggledisable">체크박스 레이블</label>
+
+	</form>
+
+	<p class="buttons">
+		<button onclick="$('#radio-toggledisable-1, #radio-toggledisable-2, #check-toggledisable').fakecheck( ( $('#check-toggledisable').attr('disabled') )? 'enable' : 'disable');">disabled속성 변경</button>
+	</p>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="radio" id="radio-toggledisable-1" name="radio-toggledisable">
+&lt;label for="radio-toggledisable-1">라디오 버튼 레이블&lt;/label>
+&lt;input type="radio" id="radio-toggledisable-2" name="radio-toggledisable">
+&lt;label for="radio-toggledisable-2">라디오 버튼 레이블&lt;/label>
+&lt;input type="checkbox" id="check-toggledisable" name="check-toggledisable">
+&lt;label for="check-toggledisable">체크박스 레이블&lt;/label></code></pre>
+<pre data-type="js"><code>$('#radio-toggledisable-1, #radio-toggledisable-2, #check-toggledisable')
+	.fakecheck( ( $('#check-toggledisable').attr('disabled') )? 'enable' : 'disable');</code></pre>
+</div>
+<!-- disabled 속성 변경 //-->
+
+
+<!-- 외부 제어 -->
+<fieldset>
+	<legend><strong>외부 제어</strong>(값을 지정한 후 <em>$().fakecheck()</em> 함수 실행)</legend>
+	<div class="padding">
+
+	<form>
+
+	<input type="radio" id="radio-out-control-1" name="radio-out-control" checked="checked">
+	<label for="radio-out-control-1">라디오 버튼 1</label>
+
+	<input type="radio" id="radio-out-control-2" name="radio-out-control">
+	<label for="radio-out-control-2">라디오 버튼 2</label>
+
+	<input type="radio" id="radio-out-control-3" name="radio-out-control">
+	<label for="radio-out-control-3">라디오 버튼 3</label>
+
+	<p class="buttons">
+		<button type="button" onclick="outcontrol_radios();">선택 변경</button>
+	</p>
+
+	<br>
+
+	<input type="checkbox" id="check-out-control-1" name="check-out-control-1">
+	<label for="check-out-control-1">체크박스 1</label>
+
+	<input type="checkbox" id="check-out-control-2" name="check-out-control-2">
+	<label for="check-out-control-2">체크박스 2</label>
+
+	<input type="checkbox" id="check-out-control-3" name="check-out-control-3">
+	<label for="check-out-control-3">체크박스 3</label>
+
+	<p class="buttons">
+		<button type="button" onclick="outcontrol_checks();">전체 선택/해제</button>
+	</p>
+
+	</form>
+
+	<script>
+	var outcontrol_radios = (function() {
+		var $radios = $('#radio-out-control-1, #radio-out-control-2, #radio-out-control-3'),
+			on = 0;
+		return function() {
+			on++;
+			if (on == $radios.length) {
+				on = 0;
+			}
+			$radios[on].checked = true;
+			$radios.fakecheck();
+		}
+	})();
+	var outcontrol_checks = (function() {
+		var $checks = $('#check-out-control-1, #check-out-control-2, #check-out-control-3')
+			checked = false;
+		return function() {
+			checked = !checked;
+			if (checked) {
+				$checks.prop('checked', true).fakecheck();
+			} else {
+				$checks.removeAttr('checked').fakecheck();
+			}
+		}
+	})();
+	</script>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;input type="radio" id="radio-out-control-1" name="radio-out-control" checked="checked">
+&lt;label for="radio-out-control-1">라디오 버튼 1&lt;/label>
+&lt;input type="radio" id="radio-out-control-2" name="radio-out-control">
+&lt;label for="radio-out-control-2">라디오 버튼 2&lt;/label>
+&lt;input type="radio" id="radio-out-control-3" name="radio-out-control">
+&lt;label for="radio-out-control-3">라디오 버튼 3&lt;/label>
+
+&lt;button type="button" onclick="outcontrol_radios();">선택 변경&lt;/button></code></pre>
+<pre data-type="js"><code>var outcontrol_radios = (function() {
+	var $radios = $('#radio-out-control-1, #radio-out-control-2, #radio-out-control-3'),
+		on = 0;
+	return function() {
+		on++;
+		if (on == $radios.length) {
+			on = 0;
+		}
+		$radios[on].checked = true;
+		$radios[[.fakecheck()]];
+	}
+})();</code></pre>
+<pre data-type="html"><code>&lt;input type="checkbox" id="check-out-control-1" name="check-out-control-1">
+&lt;label for="check-out-control-1">체크박스 1&lt;/label>
+&lt;input type="checkbox" id="check-out-control-2" name="check-out-control-2">
+&lt;label for="check-out-control-2">체크박스 2&lt;/label>
+&lt;input type="checkbox" id="check-out-control-3" name="check-out-control-3">
+&lt;label for="check-out-control-3">체크박스 3&lt;/label>
+
+&lt;button type="button" onclick="outcontrol_checks();">전체 선택/해제&lt;/button></code></pre>
+<pre data-type="js"><code>var outcontrol_checks = (function() {
+	var $checks = $('#check-out-control-1, #check-out-control-2, #check-out-control-3')
+		checked = false;
+	return function() {
+		checked = !checked;
+		if (checked) {
+			$checks.prop('checked', true)[[.fakecheck()]];
+		} else {
+			$checks.removeAttr('checked')[[.fakecheck()]];
+		}
+	}
+})();
+&lt;/script>
+</code></pre>
+</div>
+<!-- 외부 제어 //-->
+
+
+
+<h2>.fakeselect()</h2>
+
+<!-- 지원속성 -->
+<fieldset class="supports">
+	<legend><strong>지원속성</strong></legend>
+	<div class="padding">
+
+	<pre data-type="js"><code>[[data-fakeselect-hide="true"]] // 옵션 중 옵션 레이어에서는 표시하지 않을 경우
+[[data-option-width="(넓이값(숫자))"]] // 옵션 레이어 넓이를 별도로 지정하는 경우</code></pre>
+</code></pre>
+
+	</div>
+</fieldset>
+<!-- 지원속성 //-->
+
+<!-- 지원함수 -->
+<fieldset class="supports">
+	<legend><strong>지원함수</strong></legend>
+	<div class="padding">
+
+	<pre data-type="js"><code>$()[[.fakeselect('enable')]]; // disabled 상태 제거
+$()[[.fakeselect('disable')]]; // disabled 상태로 변경
+$()[[.fakeselect('remove')]]; // fakeselect 스크립트 제거
+$()[[.fakeselect()]]; // 외부에서 값을 변경하는 등의 처리를 했을 경우 상태 리셋.</code></pre>
+</code></pre>
+
+	</div>
+</fieldset>
+<!-- 지원함수 //-->
+
+
+<!-- 기본 -->
+<fieldset>
+	<legend><strong>기본</strong></legend>
+	<div class="padding">
+
+	<select style="width:100px;">
+		<option>기본</option>
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+	</select>
+
+	<select>
+		<option>스크롤</option>
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+		<option>옵션 4</option>
+		<option>옵션 5</option>
+		<option>옵션 6</option>
+		<option>옵션 7</option>
+		<option>옵션 8</option>
+		<option>옵션 9</option>
+		<option>옵션 10</option>
+	</select>
+
+	<select>
+		<option>옵션 그룹</option>
+		<optgroup label="옵션 그룹 1">
+			<option>옵션 1-1</option>
+			<option>옵션 1-2</option>
+			<option>옵션 1-3</option>
+		</optgroup>
+		<optgroup label="옵션 그룹 2" disabled="disabled">
+			<option>옵션 2-1</option>
+			<option>옵션 2-2</option>
+		</optgroup>
+		<optgroup label="옵션 그룹 3">
+			<option>옵션 3-1</option>
+			<option>옵션 3-1</option>
+			<option>옵션 3-3</option>
+		</optgroup>
+		<option disabled="disabled">옵션 4</option>
+		<option>옵션 5</option>
+	</select>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select style="width:100px;">
+	&lt;option>기본&lt;/option>
+	...
+&lt;/select>
+
+&lt;select>
+	&lt;option>스크롤&lt;/option>
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select>
+
+&lt;select>
+	&lt;option>옵션 그룹&lt;/option>
+	&lt;optgroup label="옵션 그룹 1">
+		&lt;option>옵션 1-1&lt;/option>
+		&lt;option>옵션 1-2&lt;/option>
+		&lt;option>옵션 1-3&lt;/option>
+	&lt;/optgroup>
+	...
+	&lt;option disabled="disabled">옵션 4&lt;/option>
+	&lt;option>옵션 5&lt;/option>
+&lt;/select></code></pre>
+</div>
+<!-- 기본 //-->
+
+
+<!-- 옵션 숨김 -->
+<fieldset>
+	<legend><strong>옵션 숨김</strong>(option 태그에 '<em>data-fakeselect-hide="true"</em>' 속성 추가)</legend>
+	<div class="padding">
+
+	<select>
+		<option data-fakeselect-hide="true">옵션레이어에서는 감춤</option>
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+		<option>옵션 4</option>
+	</select>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select>
+	&lt;option [[data-fakeselect-hide="true"]]>옵션레이어에서는 감춤&lt;/option>
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select></code></pre>
+</div>
+<!-- 옵션 숨김 //-->
+
+
+<!-- 옵션레이어 별도 넓이 설정 -->
+<fieldset>
+	<legend><strong>옵션레이어 별도 넓이 설정</strong>(select 태그에 '<em>data-option-width="(넓이값(숫자))"</em>' 속성 추가)</legend>
+	<div class="padding">
+
+	<select style="width:170px">
+		<option>기본설정 - 타이틀 넓이와 옵션 넓이 중 max 값으로 지정 됨</option>
+		<option>1. 옵션의 내용이 길어서 안절부절 조마조마 노심초사</option>
+		<option>2. 옵션의 내용이 길어서 안절부절 조마조마 노심초사</option>
+		<option>3. 옵션의 내용이 길어서 안절부절 조마조마 노심초사</option>
+	</select>
+
+	<select data-option-width="280" style="width:170px">
+		<option>별도 지정(&lt;select data-option-width="280")</option>
+		<option>1. 옵션의 내용이 길어서 안절부절 조마조마 노심초사</option>
+		<option>2. 옵션의 내용이 길어서 안절부절 조마조마 노심초사</option>
+		<option>3. 옵션의 내용이 길어서 안절부절 조마조마 노심초사</option>
+	</select>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select [[data-option-width="280"]] style="width:170px">
+	&lt;option>1. 옵션의 내용이 길어서 안절부절 조마조마 노심초사&lt;/option>
+	...
+&lt;/select></code></pre>
+</div>
+<!-- 옵션레이어 별도 넓이 설정 //-->
+
+
+<!-- fakeselect 적용/제거 -->
+<fieldset>
+	<legend><strong>fakeselect 적용/제거</strong>(적용 시 <em>$().fakeselect()</em> 제거 시 <em>$().fakeselect('remove')</em> 함수 실행)</legend>
+	<div class="padding">
+
+	<select id="ex-togglefakeselect">
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+	</select>
+
+	<p class="buttons">
+		<button onclick="togglefakeselect.add();">fakeselect 적용</button>
+		<button onclick="togglefakeselect.remove();">fakeselect 제거</button>
+	</p>
+
+	<script>
+	var togglefakeselect = (function() {
+		var $toggletarget = $('#ex-togglefakeselect');
+		return {
+			add: function() {
+				$toggletarget.fakeselect();
+			},
+			remove: function() {
+				$toggletarget.fakeselect('remove');
+			}
+		}
+	})();
+	</script>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select id="ex-togglefakeselect">
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select>
+&lt;button onclick="togglefakeselect.add();">fakeselect 적용&lt;/button>
+&lt;button onclick="togglefakeselect.remove();">fakeselect 제거&lt;/button></code></pre>
+<pre data-type="js"><code>var togglefakeselect = (function() {
+	var $toggletarget = $('#ex-togglefakeselect');
+	return {
+		add: function() {
+			$toggletarget[[.fakeselect()]];
+		},
+		remove: function() {
+			$toggletarget[[.fakeselect('remove')]];
+		}
+	}
+})();</code></pre>
+</div>
+<!-- fakeselect 적용/제거 //-->
+
+
+<!-- 셀렉트박스 추가 -->
+<fieldset>
+	<legend><strong>셀렉트박스 추가</strong>(추가 후 <em>$().fakeselect()</em> 함수 실행)</legend>
+	<div class="padding">
+
+	<select>
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+	</select>
+
+	<p id="ex-addselect" class="buttons">
+		<button onclick="addselect();">셀렉트박스 추가</button>
+	</p>
+
+	<script>
+	var addselect = (function() {
+		var $inserttarget = $('#ex-addselect'),
+			addselectno = 0;
+		return function() {
+			var $newselect = $('<select />'),
+				options = $newselect[0].options,
+				i = 0;
+			$newselect[0].options.length = ++addselectno;
+			for ( ; i < addselectno; i++ ) {
+				options[i].text = '추가셀렉트 '+ addselectno +' 옵션 '+ (i+1);
+			}
+			$inserttarget.before(' ').before($newselect);
+			$newselect.fakeselect();
+		}
+	})();
+	</script>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select>
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select>
+&lt;button onclick="addselect();">셀렉트박스 추가&lt;/button></code></pre>
+<pre data-type="js"><code>var addselect = (function() {
+	var $inserttarget = $('#ex-addselect'),
+		addselectno = 0;
+	return function() {
+		var $newselect = $('&lt;select />'),
+			options = $newselect[0].options,
+			i = 0;
+		$newselect[0].options.length = ++addselectno;
+		for ( ; i &lt; addselectno; i++ ) {
+			options[i].text = '추가셀렉트 '+ addselectno +' 옵션 '+ (i+1);
+		}
+		$inserttarget.before(' ').before($newselect);
+		$newselect[[.fakeselect()]];
+	}
+})();</code></pre>
+</div>
+<!-- 셀렉트박스 추가 //-->
+
+
+<!-- 디스플레이 속성 변경 -->
+<fieldset>
+	<legend><strong>디스플레이 속성 변경</strong>(보일 때 <em>$().fakeselect('show')</em>, 감출 때 <em>$().fakeselect('hide')</em> 함수 사용. 또는 직접 지정 후 <em>$().fakeselect()</em> 함수 실행.)</legend>
+	<div class="padding">
+
+	<select id="ex-display" style="display:none;">
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+	</select>
+
+	<p class="buttons">
+		<button onclick="$('#ex-display').fakeselect( ( !$('#ex-display')[0].offsetWidth )? 'show' : 'hide');">보이기/감추기</button>
+	</p>
+
+	<p id="ex-display-parent" style="margin-top:10px;display:none;">
+		<select style="width:120px;">
+			<option>옵션 1</option>
+			<option>옵션 2</option>
+			<option>옵션 3</option>
+		</select>
+		<select class="widthincss">
+			<option>옵션 1</option>
+			<option>옵션 2</option>
+			<option>옵션 3</option>
+		</select>
+		<style>.widthincss { width: 110px; }</style>
+		<select><!-- 해당 select 요소의 넓이를 확인할 수 없는 경우. $().fakescroll() 함수 옵션의 defaultwidth로 적용 -->
+			<option>옵션 1</option>
+			<option>옵션 2</option>
+			<option>옵션 3</option>
+		</select>
+	</p>
+
+	<p class="buttons">
+		<button onclick="$('#ex-display-parent')[ ( !$('#ex-display-parent')[0].offsetWidth )? 'show' : 'hide' ]();">parentNode 보이기/감추기</button>
+		<button onclick="$('#ex-display-parent select').fakeselect();">fakeselect();</button>
+	</p>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select id="ex-display" style="display:none;">
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select>
+&lt;button onclick="$('#ex-display').fakeselect( ( !$('#ex-display')[0].offsetWidth )? 'show' : 'hide');">보이기/감추기&lt;/button>
+
+&lt;p id="ex-display-parent" style="margin-top:10px;display:none;">
+	&lt;select style="width:120px;">
+		&lt;option>옵션 1&lt;/option>
+		...
+	&lt;/select>
+	&lt;style>.widthincss { width: 110px; }&lt;/style>
+	&lt;select class="widthincss">
+		&lt;option>옵션 1&lt;/option>
+		...
+	&lt;/select>
+	&lt;!-- 해당 select 요소의 넓이를 확인할 수 없는 경우. $().fakescroll() 함수 옵션의 defaultwidth로 적용 -->
+	&lt;select>
+		&lt;option>옵션 1&lt;/option>
+		...
+	&lt;/select>
+&lt;/p>
+&lt;button onclick="$('#ex-display-parent')[ ( !$('#ex-display-parent')[0].offsetWidth )? 'show' : 'hide' ]();">parentNode 보이기/감추기&lt;/button>
+&lt;button onclick="$('#ex-display-parent select')[[.fakeselect()]];">fakeselect();&lt;/button></code></pre>
+</div>
+<!-- 디스플레이 속성 변경 //-->
+
+
+<!-- disabled 속성 변경 -->
+<fieldset>
+	<legend><strong>disabled 속성 변경</strong>(속성을 제거할 때 <em>$().fakeselect('enable')</em>, 지정할 때 <em>$().fakeselect('disable')</em> 함수 사용. 또는 직접 지정 후 <em>$().fakeselect()</em>)</legend>
+	<div class="padding">
+
+	<select id="ex-disabled" disabled="disabled">
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+	</select>
+
+	<br>
+
+	<p class="buttons">
+		<button onclick="$('#ex-disabled').fakeselect( ( $('#ex-disabled').attr('disabled') )? 'enable' : 'disable');">disabled속성 변경</button>
+	</p>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select id="ex-disabled" disabled="disabled">
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select>
+
+&lt;button onclick="$('#ex-disabled').fakeselect( ( $('#ex-disabled').attr('disabled') )? 'enable' : 'disable');">disabled속성 변경&lt;/button></code></pre>
+</div>
+<!-- disabled 속성 변경 //-->
+
+
+<!-- 셀렉트박스 옵션 변경 -->
+<fieldset>
+	<legend><strong>셀렉트박스 옵션 변경</strong>(옵션값 변경 후 <em>$().fakeselect()</em> 함수 실행)</legend>
+	<div class="padding">
+
+	<select id="ex-addoption">
+		<option>옵션 1</option>
+		<option>옵션 2</option>
+		<option>옵션 3</option>
+	</select>
+
+	<br>
+
+	<p class="buttons">
+		<button onclick="optioncontrol.add('first');">처음에 추가</button>
+		<button onclick="optioncontrol.add('last');">마지막에 추가</button>
+		<button onclick="optioncontrol.remove('first');">처음옵션 삭제</button>
+		<button onclick="optioncontrol.remove('last');">마지막옵션 삭제</button>
+	</p>
+
+	<script>
+	var optioncontrol = (function() {
+		var $select = $('#ex-addoption'),
+			options = $select[0].options,
+			addoptionno = 0;
+		return {
+			add: function(flag) {
+				var newoption = document.createElement('option');
+				newoption.text = newoption.value = '추가옵션 '+ ++addoptionno;
+				options.add(newoption, ( flag == 'first' )? 0 : options.length);
+				$select.fakeselect();
+			},
+			remove: function(flag) {
+				if ( options.length ) {
+					if ( flag == 'first' ) {
+						$select[0].removeChild(options[0]);
+					} else {
+						options.length = options.length-1;
+					}
+					$select.fakeselect();
+				}
+			}
+		}
+	})();
+	</script>
+
+	</div>
+</fieldset>
+<button type="button" class="codes">View code ↓</button>
+<div class="codes">
+<pre data-type="html"><code>&lt;select id="ex-addoption">
+	&lt;option>옵션 1&lt;/option>
+	...
+&lt;/select>
+
+&lt;button onclick="optioncontrol.add('first');">처음에 추가&lt;/button>
+&lt;button onclick="optioncontrol.add('last');">마지막에 추가&lt;/button>
+&lt;button onclick="optioncontrol.remove('first');">처음옵션 삭제&lt;/button>
+&lt;button onclick="optioncontrol.remove('last');">마지막옵션 삭제&lt;/button></code></pre>
+<pre data-type="js"><code>var optioncontrol = (function() {
+	var $select = $('#ex-addoption'),
+		options = $select[0].options,
+		addoptionno = 0;
+	return {
+		add: function(flag) {
+			var newoption = document.createElement('option');
+			newoption.text = newoption.value = '추가옵션 '+ ++addoptionno;
+			options.add(newoption, ( flag == 'first' )? 0 : options.length);
+			$select[[.fakeselect()]];
+		},
+		remove: function(flag) {
+			if ( options.length ) {
+				if ( flag == 'first' ) {
+					$select[0].removeChild(options[0]);
+				} else {
+					options.length = options.length-1;
+				}
+				$select[[.fakeselect()]];
+			}
+		}
+	}
+})();</code></pre>
+</div>
+<!-- 셀렉트박스 옵션 변경 //-->
+
+
+
+<script>
+
+// toggle code
+// 버튼 토글.
+$('button.codes').each(function() {
+	var $button = $(this),
+		$code = $button.next(),
+		visible = false;
+	$button.click(function() {
+		if (visible) {
+			$button.html('View code ↓');
+			$code.hide();
+			visible = false;
+		} else {
+			$button.html('Hide code ↑');
+			$code.show();
+			visible = true;
+		}
+	});
+})
+
+// syntax highlight
+function highlight() {
+	var type = this.getAttribute('data-type'),
+		innerhtml = this.innerHTML;
+	if (type == 'html') {
+		innerhtml = innerhtml
+			.replace(/([a-z-]+)=("[^"]*")/gm, '<span class="attribute">$1</span>=<span class="attributevalue">$2</span>')
+			.replace(/&lt;([a-z]+)/igm, '&lt;<span class="tag">$1</span>')
+			.replace(/&lt;\/([a-z]+)/igm, '&lt;/<span class="tag">$1</span>')
+	} else if (type == 'js') {
+		innerhtml = innerhtml
+			.replace(/"(.+)"/gm, '<span class="string">\"$1\"</span>')
+			.replace(/'(.+)'/gm, '<span class="string">\'$1\'</span>')
+			.replace(/var( |\n)/gm, '<span class="functionvar">var$1</span>')
+			.replace(/([0-9a-z_]+)\(/igm, '<span class="functionvar">$1</span>(')
+			.replace(/([^a-z])(if|else|for|new|do|while|switch|typeof|try|catch|return|-|=+|\+=|\+\+)([^a-z])/gm, '<span class="conditions">$1$2$3</span>')
+			// .replace(/\$/gm, '<span class="conditions">$</span>')
+			.replace(/(true|false)/gm, '<span class="boolean">$1</span>')
+			.replace(/(function) (.+)\((.+)?\)/gm, '<span class="functionvar">$1</span> <span class="functionname">$2</span>(<span class="functionargument">$3</span>)')
+			.replace(/(\/\/.+)$/gm, '<span class="comment">$1</span>')
+			.replace(/(\/\*(?!\*\/)[^ㅴ]+\*\/)/gm, '<span class="comment">$1</span>');
+	}
+	this.innerHTML = innerhtml
+			.replace(/\[\[(.+)\]\]/gm, '<span class="focus">$1</span>')
+			.replace(/\t/gm, '    ')
+			.replace(/\n\r/g, '<br>');
+}
+$('pre').each(highlight);
+</script>
+</body>
+</html>
